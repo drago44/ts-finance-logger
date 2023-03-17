@@ -23,51 +23,35 @@ const oldDoc: OldDoc[] = JSON.parse(localStorage.getItem('doc') || '[]');
 
 oldDoc.forEach((item) => {
   const [type, data] = item;
+  const thisData = Object.values(data);
+  const res = doc(
+    String(thisData[0]),
+    String(thisData[1]),
+    Number(thisData[2]),
+  );
 
-  let doc: HasFormatter;
-  if (type === 'invoice') {
-    doc = new Invoice(data.client!, data.details, data.amount);
-  } else {
-    doc = new Payment(data.recipient!, data.details, data.amount);
-  }
-
-  list.render(doc, type, 'end');
+  list.render(res, type, 'end');
 });
 
 form.addEventListener('submit', (e: Event) => {
   e.preventDefault();
 
-  let doc: HasFormatter;
-  if (type.value === 'invoice') {
-    doc = new Invoice(tofrom.value, details.value, amount.valueAsNumber);
-  } else {
-    doc = new Payment(tofrom.value, details.value, amount.valueAsNumber);
-  }
+  const res = doc(tofrom.value, details.value, amount.valueAsNumber);
 
-  list.render(doc, type.value, 'end');
-  localStorage.setItem('doc', JSON.stringify([...oldDoc, [type.value, doc]]));
+  list.render(res, type.value, 'end');
+  localStorage.setItem('doc', JSON.stringify([...oldDoc, [type.value, res]]));
 });
 
-// ENUMS
+function doc(v1: string, v2: string, v3: number) {
+  let values: [string, string, number];
+  values = [v1, v2, v3];
 
-enum ResourceType { BOOK, AUTHOR, FILM, DIRECTOR };
+  let doc: HasFormatter;
+  if (type.value === 'invoice') {
+    doc = new Invoice(...values);
+  } else {
+    doc = new Payment(...values);
+  }
 
-interface Resource<T> {
-  uid: number;
-  resourceType: ResourceType;
-  data: T;
+  return doc;
 }
-
-const docOne: Resource<object> = {
-  uid: 1,
-  resourceType: ResourceType.BOOK,
-  data: { title: 'name of the wind' }
-}
-const docTwo: Resource<object> = {
-  uid: 10,
-  resourceType: ResourceType.DIRECTOR,
-  data: { title: 'name of the wind' }
-}
-
-console.log(docOne);
-console.log(docTwo);

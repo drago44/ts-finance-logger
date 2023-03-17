@@ -13,45 +13,25 @@ const list = new ListTemplate(ul);
 const oldDoc = JSON.parse(localStorage.getItem('doc') || '[]');
 oldDoc.forEach((item) => {
     const [type, data] = item;
-    let doc;
-    if (type === 'invoice') {
-        doc = new Invoice(data.client, data.details, data.amount);
-    }
-    else {
-        doc = new Payment(data.recipient, data.details, data.amount);
-    }
-    list.render(doc, type, 'end');
+    const thisData = Object.values(data);
+    const res = doc(String(thisData[0]), String(thisData[1]), Number(thisData[2]));
+    list.render(res, type, 'end');
 });
 form.addEventListener('submit', (e) => {
     e.preventDefault();
+    const res = doc(tofrom.value, details.value, amount.valueAsNumber);
+    list.render(res, type.value, 'end');
+    localStorage.setItem('doc', JSON.stringify([...oldDoc, [type.value, res]]));
+});
+function doc(v1, v2, v3) {
+    let values;
+    values = [v1, v2, v3];
     let doc;
     if (type.value === 'invoice') {
-        doc = new Invoice(tofrom.value, details.value, amount.valueAsNumber);
+        doc = new Invoice(...values);
     }
     else {
-        doc = new Payment(tofrom.value, details.value, amount.valueAsNumber);
+        doc = new Payment(...values);
     }
-    list.render(doc, type.value, 'end');
-    localStorage.setItem('doc', JSON.stringify([...oldDoc, [type.value, doc]]));
-});
-// ENUMS
-var ResourceType;
-(function (ResourceType) {
-    ResourceType[ResourceType["BOOK"] = 0] = "BOOK";
-    ResourceType[ResourceType["AUTHOR"] = 1] = "AUTHOR";
-    ResourceType[ResourceType["FILM"] = 2] = "FILM";
-    ResourceType[ResourceType["DIRECTOR"] = 3] = "DIRECTOR";
-})(ResourceType || (ResourceType = {}));
-;
-const docOne = {
-    uid: 1,
-    resourceType: ResourceType.BOOK,
-    data: { title: 'name of the wind' }
-};
-const docTwo = {
-    uid: 10,
-    resourceType: ResourceType.DIRECTOR,
-    data: { title: 'name of the wind' }
-};
-console.log(docOne);
-console.log(docTwo);
+    return doc;
+}

@@ -1,23 +1,10 @@
-// let greet: Function = () => {
-//   console.log('hello, world');
-// }
+type StringOrNum = string | number;
+type ObjWithName = { name: string; uid: StringOrNum };
 
-// greet = 'hello';
-
-// greet = () => {
-//   console.log('hello, again');
-// }
-
-const add = (a: number, b: number, c: /*?*/ number | string = 10): void => {
-  console.log(a + b);
-  console.log(c);
+const greet = (user: ObjWithName) => {
+  console.log(`${user.name} say hello`);
 };
 
-add(5, 10, 'ninja');
-
-const minus = (a: number, b: number): number => {
-  return a + b;
+const greetAgain = (user: ObjWithName) => {
+  console.log(`This ${user.uid}`);
 };
-
-let result = minus(10, 7);
-console.log(result);
